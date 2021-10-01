@@ -8,7 +8,7 @@ const controllers = require('./controllers');
 
 app.use('/', express.static(path.join(__dirname, '../client/dist')));
 
-app.get('/api/order_id/:id', controllers.calculateOrderTotal);
+app.get('/api/orders/:id', controllers.calculateOrderTotal);
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
