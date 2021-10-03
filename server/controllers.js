@@ -27,16 +27,24 @@ function calculateSubTotals(items, taxRate) {
 async function calculateOrderTotal(req, res) {
   // Run lowercase function to ensure case sensitivity
   const orderId = req.params.id.toLowerCase();
-  const orderDetails = await getOrderDetails(orderId);
-
-  if (orderDetails.status === 500) res.send(orderDetails);
+  let orderDetails;
+  let taxRate;
+  try {
+    orderDetails = await getOrderDetails(orderId);
+  } catch (err) {
+    res.send(err);
+  }
+  // Pull order id and purchaser name
   const { id, shipping_name } = orderDetails.data;
 
-  const taxRate = await findTaxRate(orderDetails.data.zip_code);
-  if (taxRate.status === 500) res.send(taxRate);
+  // Find tax rate for order zip code
+  try {
+    taxRate = await findTaxRate(orderDetails.data.zip_code);
+  } catch (err) {
+    res.send(err);
+  }
 
   orderDetails.data = new classOrder.Order(id, shipping_name, taxRate.data);
-
   orderDetails.message = 'Successful lookup of Order details and Tax Rates';
 
   // calculateSubTotal
