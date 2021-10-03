@@ -6,4 +6,6 @@ class Order {
   }
 }
 
-module.exports.Order = Order;
+module.exports = {
+  Order,
+};

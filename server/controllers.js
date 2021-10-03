@@ -2,12 +2,15 @@ const { default: axios } = require('axios');
 const classOrder = require('./orderClass');
 const classRes = require('./responseClass');
 
+const { Order } = classOrder;
+const { Response } = classRes;
+
 async function getOrderDetails(orderID) {
   try {
     const res = await axios.get(`https://code-challenge-i2hz6ik37a-uc.a.run.app/orders/${orderID}`);
-    return new classRes.Response(200, true, 'Order Details', res.data);
+    return new Response(200, true, 'Order Details', res.data);
   } catch (err) {
-    return new classRes.Response(500, false, 'Order Details', err);
+    return new Response(500, false, 'Order Details', err);
   }
 }
 
@@ -15,9 +18,9 @@ async function findTaxRate(zip) {
   try {
     const res = await axios.get(`https://code-challenge-i2hz6ik37a-uc.a.run.app/cities/${zip}`);
     const { tax_rate } = res.data;
-    return new classRes.Response(200, true, 'Tax Rate', tax_rate);
+    return new Response(200, true, 'Tax Rate', tax_rate);
   } catch (err) {
-    return new classRes.Response(500, false, 'Tax Rate', err);
+    return new Response(500, false, 'Tax Rate', err);
   }
 }
 
@@ -44,7 +47,7 @@ async function calculateOrderTotal(req, res) {
     res.send(err);
   }
 
-  orderDetails.data = new classOrder.Order(id, shipping_name, taxRate.data);
+  orderDetails.data = new Order(id, shipping_name, taxRate.data);
   orderDetails.message = 'Successful lookup of Order details and Tax Rates';
 
   // calculateSubTotal
