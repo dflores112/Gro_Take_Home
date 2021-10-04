@@ -1,5 +1,4 @@
 const { default: axios } = require('axios');
-const { Template } = require('webpack');
 const classOrder = require('./orderClass');
 const classRes = require('./responseClass');
 
@@ -25,8 +24,8 @@ async function findTaxRate(zip) {
   }
 }
 
-function financial(x) {
-  return Number.parseFloat(x).toFixed(2);
+function financial(val) {
+  return Number.parseFloat(val).toFixed(2);
 }
 
 function calculateSubTotals(items, taxRate) {
@@ -60,30 +59,27 @@ function calculateSubTotals(items, taxRate) {
 async function calculateOrderTotal(req, res) {
   // Run lowercase function to ensure case sensitivity
   const orderId = req.params.id.toLowerCase();
-  let orderDetails;
-  let taxRate;
-  try {
-    orderDetails = await getOrderDetails(orderId);
-  } catch (err) {
-    res.send(err);
+  const orderDetails = await getOrderDetails(orderId);
+
+  // Pull order information including items ordered
+  if (orderDetails.status === 500) {
+    return res.send(orderDetails);
   }
   // Pull order id and purchaser name
   const { id, shipping_name, order_items } = orderDetails.data;
 
   // Find tax rate for order zip code
-  try {
-    taxRate = await findTaxRate(orderDetails.data.zip_code);
-  } catch (err) {
-    res.send(err);
+  const taxRate = await findTaxRate(orderDetails.data.zip_code);
+  if (taxRate.status === 500) {
+    return res.send(taxRate);
   }
-
   const subTotals = calculateSubTotals(order_items, taxRate.data);
   const { subTotal, taxes, total } = subTotals;
 
   orderDetails.data = new Order(id, shipping_name, taxes, subTotal, total);
   orderDetails.message = 'Successful lookup of Order details and Tax Rates';
 
-  res.send(orderDetails);
+  return res.send(orderDetails);
 }
 
 module.exports = {
