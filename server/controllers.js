@@ -1,4 +1,5 @@
 const { default: axios } = require('axios');
+const { Template } = require('webpack');
 const classOrder = require('./orderClass');
 const classRes = require('./responseClass');
 
@@ -24,7 +25,36 @@ async function findTaxRate(zip) {
   }
 }
 
+function financial(x) {
+  return Number.parseFloat(x).toFixed(2);
+}
+
 function calculateSubTotals(items, taxRate) {
+  const totals = { subTotal: 0, taxes: 0, total: 0 };
+
+  // convert tax rate ex: 7.25 === 0.0725
+  const taxes = taxRate / 100;
+
+  for (let i = 0; i < items.length; i++) {
+    const currentItem = items[i];
+    const currentItemPrice = currentItem.price / 100;
+    const taxesOnItem = currentItemPrice * taxes;
+
+    // add item price to subtotal and overall total
+    totals.subTotal += currentItemPrice * currentItem.quantity;
+    totals.total += currentItemPrice * currentItem.quantity;
+
+    // if item is taxable then add tax to total and taxes
+    if (currentItem.taxable) {
+      totals.total += taxesOnItem * currentItem.quantity;
+      totals.taxes += taxesOnItem * currentItem.quantity;
+    }
+  }
+  // round all financial totals
+  totals.subTotal = financial(totals.subTotal);
+  totals.taxes = financial(totals.taxes);
+  totals.total = financial(totals.total);
+  return totals;
 }
 
 async function calculateOrderTotal(req, res) {
@@ -38,7 +68,7 @@ async function calculateOrderTotal(req, res) {
     res.send(err);
   }
   // Pull order id and purchaser name
-  const { id, shipping_name } = orderDetails.data;
+  const { id, shipping_name, order_items } = orderDetails.data;
 
   // Find tax rate for order zip code
   try {
@@ -47,10 +77,11 @@ async function calculateOrderTotal(req, res) {
     res.send(err);
   }
 
-  orderDetails.data = new Order(id, shipping_name, taxRate.data);
-  orderDetails.message = 'Successful lookup of Order details and Tax Rates';
+  const subTotals = calculateSubTotals(order_items, taxRate.data);
+  const { subTotal, taxes, total } = subTotals;
 
-  // calculateSubTotal
+  orderDetails.data = new Order(id, shipping_name, taxes, subTotal, total);
+  orderDetails.message = 'Successful lookup of Order details and Tax Rates';
 
   res.send(orderDetails);
 }

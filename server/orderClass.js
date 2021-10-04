@@ -1,8 +1,10 @@
 class Order {
-  constructor(order, customerName, taxRate) {
+  constructor(order, customerName, taxes, subTotal, total) {
     this.order = order;
     this.customerName = customerName;
-    this.taxRate = taxRate;
+    this.taxes = taxes;
+    this.subTotal = subTotal;
+    this.total = total;
   }
 }
 
