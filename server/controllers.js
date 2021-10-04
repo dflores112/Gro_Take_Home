@@ -84,7 +84,7 @@ async function calculateOrderTotal(req, res) {
 
   // Pull order information including items ordered
   if (orderDetails.status === 500) {
-    return res.send(orderDetails);
+    return res.status(500).send(orderDetails);
   }
   // Pull order id and purchaser name
   let { order_items } = orderDetails.data;
@@ -100,7 +100,7 @@ async function calculateOrderTotal(req, res) {
   // Find tax rate for order zip code
   const taxRate = await findTaxRate(orderDetails.data.zip_code);
   if (taxRate.status === 500) {
-    return res.send(taxRate);
+    return res.status(500).send(taxRate);
   }
   const subTotals = calculateSubTotals(order_items, taxRate.data);
   const { subTotal, taxes, total } = subTotals;
