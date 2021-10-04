@@ -1,16 +1,37 @@
 const { default: axios } = require('axios');
-const classOrder = require('./orderClass');
-const classRes = require('./responseClass');
+const classOrder = require('../classes/orderClass');
+const classRes = require('../classes/responseClass');
 
 const { Order } = classOrder;
 const { Response } = classRes;
+
+async function checkOrderList(orderId) {
+  try {
+    const res = await axios.get('https://code-challenge-i2hz6ik37a-uc.a.run.app/orders');
+    for (let i = 0; i < res.data.length; i++) {
+      const currentOrder = res.data[i];
+      // if an orderid matches order within list send positive response
+      if (currentOrder.id === orderId) {
+        return new Response(200, true, 'Order Details', currentOrder);
+      }
+    }
+  } catch (err) {
+    return new Response(500, false, 'Order Details', err);
+  }
+}
 
 async function getOrderDetails(orderID) {
   try {
     const res = await axios.get(`https://code-challenge-i2hz6ik37a-uc.a.run.app/orders/${orderID}`);
     return new Response(200, true, 'Order Details', res.data);
   } catch (err) {
-    return new Response(500, false, 'Order Details', err);
+    // Ensure failure/confirmation of existence of order
+    try {
+      const data = await checkOrderList(orderID);
+      return new Response(200, true, 'Order Details', data.data);
+    } catch (err2) {
+      return new Response(500, false, 'Order Details', err2);
+    }
   }
 }
 
@@ -66,7 +87,15 @@ async function calculateOrderTotal(req, res) {
     return res.send(orderDetails);
   }
   // Pull order id and purchaser name
-  const { id, shipping_name, order_items } = orderDetails.data;
+  let { order_items } = orderDetails.data;
+  const {id,shipping_name} = orderDetails.data;
+
+  // if using orders retrival instead of orderid ensure items ordered is iterable
+  if (!Array.isArray(order_items)) {
+    const temp = [];
+    temp.push(order_items);
+    order_items = temp;
+  }
 
   // Find tax rate for order zip code
   const taxRate = await findTaxRate(orderDetails.data.zip_code);
