@@ -4,7 +4,9 @@ import axios from 'axios';
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { id: '' };
+    this.state = {
+      id: '', orderId: '', subtotal: 0, taxes: 0, total: 0, err: '',
+    };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -17,22 +19,50 @@ class App extends React.Component {
   handleSubmit(event) {
     event.preventDefault();
     const { id } = this.state;
+
     axios.get(`/api/orders/${id}`)
-      .then((response) => {
-        console.log(response);
+      .then((res) => {
+        const {
+          order, subTotal, taxes, total,
+        } = res.data.data;
+        this.setState({
+          orderId: order, subtotal: subTotal, taxes, total, err: '',
+        });
       })
-      .catch((error) => {
-        console.log(error);
+      .catch((err) => {
+        this.setState({ err: err.message });
       });
   }
 
   render() {
-    const { id } = this.state;
+    const {
+      id, subtotal, taxes, total, orderId, err,
+    } = this.state;
     return (
       <form onSubmit={this.handleSubmit}>
         Order ID:
         <input type="text" value={id} onChange={this.handleChange} />
         <input type="submit" value="Submit" />
+        <div>
+          Order:
+          {' '}
+          {orderId}
+        </div>
+        <div>
+          SubTotal:
+          {subtotal}
+        </div>
+        <div>
+          Taxes:
+          {taxes}
+        </div>
+        <div>
+          Total:
+          {total}
+        </div>
+        <div>
+          {err}
+        </div>
       </form>
     );
   }

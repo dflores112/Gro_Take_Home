@@ -15,6 +15,8 @@ async function checkOrderList(orderId) {
         return new Response(200, true, 'Order Details', currentOrder);
       }
     }
+    // if order is not found return an error
+    return new Response(500, false, 'Order Details');
   } catch (err) {
     return new Response(500, false, 'Order Details', err);
   }
