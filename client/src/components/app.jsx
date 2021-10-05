@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import Styles from './styled.jsx';
 
 class App extends React.Component {
   constructor(props) {
@@ -39,31 +40,34 @@ class App extends React.Component {
       id, subtotal, taxes, total, orderId, err,
     } = this.state;
     return (
-      <form onSubmit={this.handleSubmit}>
-        Order ID:
-        <input type="text" value={id} onChange={this.handleChange} />
-        <input type="submit" value="Submit" />
-        <div>
+      <Styles.Form onSubmit={this.handleSubmit}>
+        Enter Order ID
+        <Styles.Input type="text" value={id} onChange={this.handleChange} />
+        <Styles.Submit type="submit" value="Find Order" />
+        <Styles.Totals>
           Order:
           {' '}
           {orderId}
-        </div>
-        <div>
+        </Styles.Totals>
+        <Styles.Totals>
           SubTotal:
+          $
           {subtotal}
-        </div>
-        <div>
+        </Styles.Totals>
+        <Styles.Totals>
           Taxes:
+          $
           {taxes}
-        </div>
-        <div>
+        </Styles.Totals>
+        <Styles.Totals>
           Total:
+          $
           {total}
-        </div>
-        <div>
+        </Styles.Totals>
+        <Styles.Err>
           {err}
-        </div>
-      </form>
+        </Styles.Err>
+      </Styles.Form>
     );
   }
 }

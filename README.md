@@ -30,6 +30,9 @@ Post source code of your solution to your code sharing platform of choice: githu
 # Order Lookup
 This is a feature to view order totals, subtotals, and taxes when looking up an order
 
+<img src="orderLookup.png" alt="OrderLookup"/>
+
+
 ## Development
 ## Server API
 
