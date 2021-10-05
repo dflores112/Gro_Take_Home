@@ -6,7 +6,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      id: '', orderId: '', subtotal: 0, taxes: 0, total: 0, err: '',
+      id: '', orderId: '', subtotal: 0, taxes: 0, total: 0, err: '', customerName: '',
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -24,10 +24,10 @@ class App extends React.Component {
     axios.get(`/api/orders/${id}`)
       .then((res) => {
         const {
-          order, subTotal, taxes, total,
+          order, subTotal, taxes, total, customerName,
         } = res.data.data;
         this.setState({
-          orderId: order, subtotal: subTotal, taxes, total, err: '',
+          orderId: order, subtotal: subTotal, taxes, total, err: '', customerName,
         });
       })
       .catch(() => {
@@ -37,7 +37,7 @@ class App extends React.Component {
 
   render() {
     const {
-      id, subtotal, taxes, total, orderId, err,
+      id, subtotal, taxes, total, orderId, err, customerName,
     } = this.state;
     return (
       <Styles.Form onSubmit={this.handleSubmit}>
@@ -48,6 +48,11 @@ class App extends React.Component {
           Order:
           {' '}
           {orderId}
+        </Styles.Totals>
+        <Styles.Totals>
+          Customer Name:
+          {' '}
+          {customerName}
         </Styles.Totals>
         <Styles.Totals>
           SubTotal:

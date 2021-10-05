@@ -33,7 +33,7 @@ font-style:normal;
 font-weight:400;
 background-color: #fff;
 width: 350px;
-height:240px;
+height:260px;
 
 padding: 25px;
 color: #033b4c;
