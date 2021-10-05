@@ -30,8 +30,8 @@ class App extends React.Component {
           orderId: order, subtotal: subTotal, taxes, total, err: '',
         });
       })
-      .catch((err) => {
-        this.setState({ err: err.message });
+      .catch(() => {
+        this.setState({ err: `Error Finding order: ${id}` });
       });
   }
 
